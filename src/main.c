@@ -1648,9 +1648,17 @@ early_arg_scan(mparm_T *parmp UNUSED)
 # ifdef FEAT_CLIENTSERVER
 	else if (STRICMP(argv[i], "--servername") == 0)
 	{
+	    char_u *p;
 	    if (i == argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
-	    parmp->serverName_arg = (char_u *)argv[++i];
+	    if (strstr((char_u *)argv[++i], "%d") != NULL) {
+		size_t len = strlen(argv[i])+10;
+		p = alloc(len);
+		vim_snprintf((char *)p, len, argv[i], getpid());
+	    } else {
+		p = (char_u *)argv[i];
+	    }
+	    parmp->serverName_arg = (char_u *) p;
 	}
 	else if (STRICMP(argv[i], "--serverlist") == 0)
 	    parmp->serverArg = TRUE;
